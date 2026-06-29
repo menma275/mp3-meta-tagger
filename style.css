@@ -85,7 +85,6 @@ body {
   font-size: 24px;
   font-weight: 800;
   color: var(--fg);
-  text-transform: uppercase;
   letter-spacing: 1px;
 }
 
@@ -95,7 +94,6 @@ body {
   padding: 2px 6px;
   background: var(--fg);
   color: var(--bg);
-  text-transform: uppercase;
   border-radius: var(--border-radius-sm);
 }
 
@@ -161,7 +159,6 @@ body {
   font-size: 14px;
   font-weight: 700;
   color: var(--fg);
-  text-transform: uppercase;
 }
 
 .dropzone-desc {
@@ -217,7 +214,6 @@ body {
   color: var(--button-fg);
   cursor: pointer;
   border-radius: var(--border-radius-sm);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: background var(--transition), color var(--transition);
   display: inline-flex;
@@ -318,7 +314,6 @@ body {
 .card-section-title h3 {
   font-size: 11px;
   font-weight: 700;
-  text-transform: uppercase;
   color: var(--fg);
   flex: 1;
 }
@@ -420,7 +415,6 @@ body {
   font-size: 10px;
   font-weight: 700;
   color: var(--fg-secondary);
-  text-transform: uppercase;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -605,7 +599,6 @@ body {
   font-size: 14px;
   font-weight: 700;
   color: var(--fg);
-  text-transform: uppercase;
 }
 
 .track-title-info p {
@@ -793,7 +786,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  text-transform: uppercase;
 }
 
 .tab-btn i {
@@ -919,7 +911,6 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  text-transform: uppercase;
 }
 
 .inst-icon {
