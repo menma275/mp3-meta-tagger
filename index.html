@@ -3,12 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AuraTag - Advanced Album MP3 Metadata & Lyrics Editor</title>
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <title>mp3metatagger - Advanced Album MP3 Metadata & Lyrics Editor</title>
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -21,7 +16,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Dynamic blurred background based on active track cover art -->
+  <!-- Background structures (hidden in CSS but kept for DOM compatibility) -->
   <div class="dynamic-bg" id="dynamicBg"></div>
   <div class="bg-overlay"></div>
 
@@ -29,9 +24,7 @@
     <!-- Header -->
     <header class="app-header">
       <div class="logo">
-        <i data-lucide="music-4" class="logo-icon"></i>
-        <h1>AuraTag</h1>
-        <span class="badge">Album Mode</span>
+        <h1>mp3metatagger</h1>
       </div>
       <p class="subtitle">複数MP3の一括アルバム化 & 同期歌詞エディター</p>
     </header>
@@ -48,7 +41,7 @@
               <i data-lucide="upload-cloud" class="dropzone-icon"></i>
             </div>
             <p class="dropzone-title">MP3ファイルをドラッグ＆ドロップ</p>
-            <p class="dropzone-desc">単一または複数のファイルを選択可能</p>
+            <p class="dropzone-desc">または ファイルを選択</p>
             <button class="btn btn-secondary select-btn" id="selectFileBtn">ファイルを選択</button>
           </div>
         </div>
@@ -58,7 +51,7 @@
           <div class="file-info-header">
             <i data-lucide="folder-open" class="file-icon"></i>
             <span class="file-name" id="loadedSummaryText">0 ファイル読み込み完了</span>
-            <button class="btn-icon reset-btn" id="resetBtn" title="全解除してリセット">
+            <button class="btn reset-btn" id="resetBtn" title="全解除してリセット">
               <i data-lucide="refresh-cw"></i>
             </button>
           </div>
@@ -76,7 +69,6 @@
               <img src="" alt="Cover Art" id="coverPreview" class="cover-image placeholder-art">
               <div class="artwork-overlay" id="changeArtworkOverlay">
                 <i data-lucide="camera" class="overlay-icon"></i>
-                <span>アートワーク変更</span>
               </div>
               <input type="file" id="artworkInput" accept="image/*" style="display: none;">
             </div>
@@ -122,6 +114,77 @@
 
       <!-- Right Panel: Audio Player & Track-Specific Lyrics Hub -->
       <section class="panel right-panel">
+        <!-- Main Selected Track Details and Player -->
+        <div class="track-detail-header" id="trackDetailHeader">
+          <div class="track-no-badge" id="trackDetailNo">#</div>
+          <div class="track-title-info">
+            <h2 id="trackDetailTitle">曲が選択されていません</h2>
+            <p id="trackDetailArtist">MP3ファイルをアップロードしてください</p>
+          </div>
+        </div>
+
+        <!-- Active Track Specific Metadata Fields & Audio Player -->
+        <div class="player-card track-player-card" id="trackPlayerCard">
+          <div class="metadata-form track-specific-form">
+            <div class="form-row">
+              <div class="form-group flex-3">
+                <label for="inputTitle"><i data-lucide="type" class="field-icon"></i>曲名</label>
+                <input type="text" id="inputTitle" placeholder="タイトル" disabled>
+              </div>
+              <div class="form-group flex-2">
+                <label for="inputArtist"><i data-lucide="user" class="field-icon"></i>アーティスト</label>
+                <input type="text" id="inputArtist" placeholder="アーティスト" disabled>
+              </div>
+              <div class="form-group flex-1">
+                <label for="inputTrackNumber"><i data-lucide="hash" class="field-icon"></i>トラック</label>
+                <input type="text" id="inputTrackNumber" placeholder="No." disabled>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audio Player Controls -->
+          <div class="audio-player">
+            <div class="player-progress">
+              <span class="time-display" id="currentTime">00:00</span>
+              <div class="progress-bar-container" id="progressContainer">
+                <div class="progress-bar-bg"></div>
+                <div class="progress-bar-fill" id="progressFill"></div>
+                <div class="progress-bar-handle" id="progressHandle"></div>
+              </div>
+              <span class="time-display" id="durationTime">00:00</span>
+            </div>
+
+            <div class="player-controls">
+              <button class="btn-icon control-btn" id="rewindBtn" disabled title="5秒戻る">
+                <i data-lucide="rotate-ccw"></i>
+              </button>
+              <button class="btn-icon control-btn btn-play" id="playBtn" disabled title="再生/一時停止">
+                <i data-lucide="play" id="playIcon"></i>
+              </button>
+              <button class="btn-icon control-btn" id="forwardBtn" disabled title="5秒進む">
+                <i data-lucide="rotate-cw"></i>
+              </button>
+            </div>
+
+            <div class="volume-control">
+              <i data-lucide="volume-2" class="volume-icon" id="volumeIcon"></i>
+              <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
+            </div>
+          </div>
+        </div>
+
+        <!-- Original Metadata Summary -->
+        <div class="original-meta-card hidden" id="originalMetaCard">
+          <div class="card-section-title">
+            <i data-lucide="info" class="section-title-icon"></i>
+            <h3>元のメタデータ (読込値)</h3>
+          </div>
+          <div class="meta-grid" id="originalMetaGrid">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Panel Tabs (Switch tabs under the player) -->
         <div class="panel-tabs">
           <button class="tab-btn active" data-tab="lyrics-view" id="tabLyricsView">
             <i data-lucide="sparkles"></i>同期再生ビュー
@@ -134,76 +197,8 @@
           </button>
         </div>
 
+        <!-- Content Area for Active Tab -->
         <div class="tab-content-container">
-          <!-- Main Selected Track Details and Player -->
-          <div class="track-detail-header" id="trackDetailHeader">
-            <div class="track-no-badge" id="trackDetailNo">#</div>
-            <div class="track-title-info">
-              <h2 id="trackDetailTitle">曲が選択されていません</h2>
-              <p id="trackDetailArtist">MP3ファイルをアップロードしてください</p>
-            </div>
-          </div>
-
-          <!-- Active Track Specific Metadata Fields & Audio Player -->
-          <div class="player-card track-player-card" id="trackPlayerCard">
-            <div class="metadata-form track-specific-form">
-              <div class="form-row">
-                <div class="form-group flex-3">
-                  <label for="inputTitle"><i data-lucide="type" class="field-icon"></i>曲名</label>
-                  <input type="text" id="inputTitle" placeholder="タイトル" disabled>
-                </div>
-                <div class="form-group flex-2">
-                  <label for="inputArtist"><i data-lucide="user" class="field-icon"></i>アーティスト</label>
-                  <input type="text" id="inputArtist" placeholder="アーティスト" disabled>
-                </div>
-                <div class="form-group flex-1">
-                  <label for="inputTrackNumber"><i data-lucide="hash" class="field-icon"></i>トラック</label>
-                  <input type="text" id="inputTrackNumber" placeholder="No." disabled>
-                </div>
-              </div>
-            </div>
-
-            <!-- Audio Player Controls -->
-            <div class="audio-player">
-              <div class="player-progress">
-                <span class="time-display" id="currentTime">00:00</span>
-                <div class="progress-bar-container" id="progressContainer">
-                  <div class="progress-bar-bg"></div>
-                  <div class="progress-bar-fill" id="progressFill"></div>
-                  <div class="progress-bar-handle" id="progressHandle"></div>
-                </div>
-                <span class="time-display" id="durationTime">00:00</span>
-              </div>
-
-              <div class="player-controls">
-                <button class="btn-icon control-btn" id="rewindBtn" disabled title="5秒戻る">
-                  <i data-lucide="rotate-ccw"></i>
-                </button>
-                <button class="btn-icon control-btn btn-play" id="playBtn" disabled title="再生">
-                  <i data-lucide="play" id="playIcon"></i>
-                </button>
-                <button class="btn-icon control-btn" id="forwardBtn" disabled title="5秒進む">
-                  <i data-lucide="rotate-cw"></i>
-                </button>
-              </div>
-
-              <div class="volume-control">
-                <i data-lucide="volume-2" class="volume-icon" id="volumeIcon"></i>
-                <input type="range" id="volumeSlider" min="0" max="1" step="0.05" value="0.8">
-            </div>
-          </div>
-
-          <!-- Original Metadata Summary -->
-          <div class="original-meta-card hidden" id="originalMetaCard">
-            <div class="card-section-title">
-              <i data-lucide="info" class="section-title-icon"></i>
-              <h3>元のメタデータ (読込値)</h3>
-            </div>
-            <div class="meta-grid" id="originalMetaGrid">
-              <!-- Rendered dynamically -->
-            </div>
-          </div>
-
           <!-- Tab Content 1: Live Viewer -->
           <div class="tab-content active" id="tabContentLyricsView">
             <div class="lyrics-viewer-container" id="lyricsViewer">
@@ -285,7 +280,7 @@
 
     <!-- Footer -->
     <footer class="app-footer">
-      <p>&copy; 2026 AuraTag Album Edition. Client-side processing. Your audio files are never uploaded to any server.</p>
+      <p>&copy; 2026 mp3metatagger Album Edition. Client-side processing. Your audio files are never uploaded to any server.</p>
     </footer>
   </div>
 

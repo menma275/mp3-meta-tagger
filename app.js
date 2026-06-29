@@ -542,7 +542,6 @@ function updateAlbumCoverUI() {
     coverPreview.src = imgUrl;
     coverPreview.classList.remove('placeholder-art');
     artworkContainer.classList.add('active');
-    dynamicBg.style.backgroundImage = `url(${imgUrl})`;
   } else {
     resetArtworkToPlaceholder();
   }
@@ -575,7 +574,7 @@ function renderTrackList() {
     info.appendChild(title);
     info.appendChild(artist);
     
-    // Lyrics Synced indicator badge
+    // Lyrics Synced indicator badge (Lucide Icon based)
     const hasSync = (track.lyricsLines || []).some(l => l.time !== null);
     const badge = document.createElement('div');
     badge.className = `track-item-badge ${hasSync ? '' : 'hidden'}`;
@@ -705,6 +704,8 @@ function selectTrack(trackId) {
     } else {
       originalMetaCard.classList.add('hidden');
     }
+    
+    try { lucide.createIcons(); } catch(e){}
   } catch (err) {
     console.error("Error in selectTrack:", err);
   }
@@ -744,7 +745,6 @@ function resetArtworkToPlaceholder() {
   coverPreview.removeAttribute('src');
   coverPreview.classList.add('placeholder-art');
   artworkContainer.classList.remove('active');
-  dynamicBg.style.backgroundImage = '';
   state.albumCoverBuffer = null;
   state.albumCoverMime = '';
 }
@@ -1050,12 +1050,13 @@ function setupSyncMode() {
   renderSyncGrid();
 }
 
+// Render Grid
 function renderSyncGrid() {
   syncLinesList.innerHTML = '';
   
   const active = getActiveTrack();
   if (!active || !active.lyricsLines || active.lyricsLines.length === 0) {
-    syncLinesList.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 24px 0; font-size: 13px;">歌詞テキストがありません</div>';
+    syncLinesList.innerHTML = '<div style="color: var(--fg-secondary); text-align: center; padding: 24px 0; font-size: 11px;">歌詞テキストがありません</div>';
     syncProgressText.textContent = '0 / 0 行';
     return;
   }
@@ -1143,7 +1144,7 @@ function recordTimestamp() {
     state.currentSyncIndex++;
   } else {
     state.isSyncModeActive = false;
-    alert('すべての行の同期が完了しました！');
+    alert('すべての行 of 同期が完了しました！');
   }
   
   renderSyncGrid();
